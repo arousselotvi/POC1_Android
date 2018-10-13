@@ -12,20 +12,24 @@
 
         <Button
             android:id="@+id/getButton"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Connect by GET" />
 
         <Button
             android:id="@+id/postButton"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Connect by POST" />
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
     <TextView
         android:id="@+id/response"
         android:layout_width="match_parent"
@@ -33,4 +37,16 @@
         android:layout_margin="10dp"
         android:textColor="@android:color/black"
         android:textSize="16dp" />
+
+    <Button
+        android:id="@+id/barcodeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:text="S'authentifier" />
+
+</LinearLayout>
+
+
 </LinearLayout>

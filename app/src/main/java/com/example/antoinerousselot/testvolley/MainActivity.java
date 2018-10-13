@@ -2,6 +2,7 @@ package com.example.antoinerousselot.testvolley;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
+import com.example.antoinerousselot.barcode.BarcodeCaptureActivity;
 import com.example.antoinerousselot.network.UrlConstants;
 import com.example.antoinerousselot.network.NetworkController;
 
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     Button getButton;
     Button postButton;
+    Button barcodeButton;
     TextView responseTv;
 
     @Override
@@ -35,10 +38,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         getButton = (Button) findViewById(R.id.getButton);
         postButton = (Button) findViewById(R.id.postButton);
+        barcodeButton = (Button) findViewById(R.id.barcodeButton);
         responseTv = (TextView) findViewById(R.id.response);
 
         getButton.setOnClickListener(this);
         postButton.setOnClickListener(this);
+        barcodeButton.setOnClickListener(this);
     }
 
     @Override
@@ -56,6 +61,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 stringParams.put("imageURL", "https://www.google.fr/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=2ahUKEwiC99ql6_ndAhXuzoUKHWcyBdIQjRx6BAgBEAU&url=http%3A%2F%2Fwww.allocine.fr%2Fpersonne%2Ffichepersonne-9081%2Fphotos%2Fdetail%2F%3Fcmediafile%3D20179869&psig=AOvVaw1oASgkvcFUSiwIr2raXHTJ&ust=1539190957368080");
 
                 NetworkController.getInstance().connect(this, POST_URL_REQUEST_CODE, Request.Method.POST, stringParams, this);
+
+                break;
+            case R.id.barcodeButton:
+                Intent intentBarcode = new Intent(this,BarcodeCaptureActivity.class);
+                startActivity(intentBarcode);
 
                 break;
         }
