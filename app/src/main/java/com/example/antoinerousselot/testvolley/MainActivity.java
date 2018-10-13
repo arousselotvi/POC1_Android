@@ -16,6 +16,7 @@ import com.android.volley.VolleyError;
 import com.example.antoinerousselot.barcode.BarcodeCaptureActivity;
 import com.example.antoinerousselot.network.UrlConstants;
 import com.example.antoinerousselot.network.NetworkController;
+import com.google.android.gms.common.api.CommonStatusCodes;
 
 import org.json.JSONObject;
 
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button postButton;
     Button barcodeButton;
     TextView responseTv;
+
+    private int REQUEST_CODE=100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.barcodeButton:
                 Intent intentBarcode = new Intent(this,BarcodeCaptureActivity.class);
-                startActivity(intentBarcode);
+                startActivityForResult(intentBarcode,REQUEST_CODE);
 
                 break;
         }
@@ -97,5 +100,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (progressDialog != null && progressDialog.isShowing())
             progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == CommonStatusCodes.SUCCESS && requestCode == REQUEST_CODE){
+            if (data.hasExtra("barcode")){
+                Toast.makeText(this,data.getStringExtra("barcode"),Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
