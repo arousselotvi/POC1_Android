@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.example.antoinerousselot.barcode.BarcodeCaptureActivity" />
+        <activity android:name=".SecondActivity"></activity>
     </application>
 
 </manifest>

@@ -3,12 +3,9 @@ package com.example.antoinerousselot.testvolley;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,19 +14,20 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.example.antoinerousselot.barcode.BarcodeCaptureActivity;
-import com.example.antoinerousselot.gesture.DetectSwipeGestureListener;
 import com.example.antoinerousselot.network.UrlConstants;
 import com.example.antoinerousselot.network.NetworkController;
 import com.google.android.gms.common.api.CommonStatusCodes;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
 import static com.example.antoinerousselot.network.UrlConstants.GET_URL_REQUEST_CODE;
+import static com.example.antoinerousselot.network.UrlConstants.POST_URL_AUTHPLAYER1_REQUEST_CODE;
 import static com.example.antoinerousselot.network.UrlConstants.POST_URL_REQUEST_CODE;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, NetworkController.ResultListener,GestureDetector.OnDoubleTapListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NetworkController.ResultListener{
 
     Button getButton;
     Button postButton;
@@ -38,13 +36,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //For Gesture detection
     private static final String DEBUG_TAG = "Gestures";
-    private GestureDetectorCompat mDetector;
 
     //For Barcode scanning
     private int REQUEST_CODE=100;
-
-    // This is the gesture detector compat instance.
-    private GestureDetectorCompat gestureDetectorCompat = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,14 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         postButton.setOnClickListener(this);
         barcodeButton.setOnClickListener(this);
 
-        // Create a common gesture listener object.
-        DetectSwipeGestureListener gestureListener = new DetectSwipeGestureListener();
 
-        // Set activity in the listener.
-        gestureListener.setActivity(this);
-
-        // Create the gesture detector with the gesture listener.
-        gestureDetectorCompat = new GestureDetectorCompat(this, gestureListener);
 
     }
 
@@ -97,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) {
+    public void onResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException {
 
         if (requestCode == POST_URL_REQUEST_CODE)
         {
@@ -119,6 +106,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 responseTv.setText(jsonObject.toString());
             }
         }
+        else if (requestCode == POST_URL_AUTHPLAYER1_REQUEST_CODE)
+        {
+            if (isSuccess)
+            {
+                Log.e("MainActivity", "onResult() called 3");
+
+                String resultatAuth = jsonObject.getString("AuthStatus");
+
+                if (resultatAuth.equals("AuthFailed")) {
+                    Toast.makeText(this, "Authentication failed, try again", Toast.LENGTH_SHORT).show();
+                    Intent intentBarcodeRetry = new Intent(this,BarcodeCaptureActivity.class);
+                    startActivityForResult(intentBarcodeRetry,REQUEST_CODE);
+                }
+                else {
+                    Toast.makeText(this, "Welcome to paradise TOTEM", Toast.LENGTH_SHORT).show();
+                    Intent openSecondAct = new Intent(this,SecondActivity.class);
+                    startActivity(openSecondAct);
+                }
+            }
+
+        }
 
         if (progressDialog != null && progressDialog.isShowing())
             progressDialog.dismiss();
@@ -128,37 +136,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == CommonStatusCodes.SUCCESS && requestCode == REQUEST_CODE){
             if (data != null && data.hasExtra("barcode")){
-                Toast.makeText(this,data.getStringExtra("barcode"),Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this,data.getStringExtra("barcode"),Toast.LENGTH_SHORT).show();
+                HashMap<String, String> stringParamsAuth = new HashMap<>();
+                stringParamsAuth.put("barcodeSent", data.getStringExtra("barcode"));
+                NetworkController.getInstance().connect(this, POST_URL_AUTHPLAYER1_REQUEST_CODE, Request.Method.POST, stringParamsAuth, this);
             }
         }
     }
 
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event){
-        if (this.gestureDetectorCompat.onTouchEvent(event)) {
-            return true;
-        }
-        return super.onTouchEvent(event);
-    }
-
-    @Override
-    public boolean onDoubleTap(MotionEvent event) {
-        Log.d(DEBUG_TAG, "onDoubleTap: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent event) {
-        Log.d(DEBUG_TAG, "onDoubleTapEvent: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent event) {
-        Log.d(DEBUG_TAG, "onSingleTapConfirmed: " + event.toString());
-        return true;
-    }
 
 
 }

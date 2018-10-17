@@ -12,6 +12,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.annotation.Retention;
@@ -67,14 +68,22 @@ public class NetworkController {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
                         Log.e(TAG, "onResponse() called");
-                        resultListener.onResult(requestCode, true, jsonObject, null, progressDialog);
+                        try {
+                            resultListener.onResult(requestCode, true, jsonObject, null, progressDialog);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 },
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
                                 Log.e(TAG, "onErrorResponse() called");
-                                resultListener.onResult(requestCode, false, null, error, progressDialog);
+                                try {
+                                    resultListener.onResult(requestCode, false, null, error, progressDialog);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                                 error.printStackTrace();
                             }
                         });
@@ -109,6 +118,9 @@ public class NetworkController {
             case UrlConstants.POST_URL_REQUEST_CODE:
                 url = UrlConstants.POST_URL;
                 break;
+            case UrlConstants.POST_URL_AUTHPLAYER1_REQUEST_CODE:
+                url = UrlConstants.POST_URL_AUTH_PLAYER1;
+                break;
         }
         return url;
     }
@@ -134,7 +146,7 @@ public class NetworkController {
 
     public interface ResultListener {
 
-        void onResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog);
+        void onResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException;
 
     }
 

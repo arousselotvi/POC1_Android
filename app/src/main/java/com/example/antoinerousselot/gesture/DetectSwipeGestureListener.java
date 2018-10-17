@@ -5,6 +5,7 @@ import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.example.antoinerousselot.testvolley.MainActivity;
+import com.example.antoinerousselot.testvolley.SecondActivity;
 
 /**
  * Created by Jerry on 4/18/2018.
@@ -13,21 +14,21 @@ import com.example.antoinerousselot.testvolley.MainActivity;
 public class DetectSwipeGestureListener extends GestureDetector.SimpleOnGestureListener {
 
     // Minimal x and y axis swipe distance.
-    private static int MIN_SWIPE_DISTANCE_X = 1000;
-    private static int MIN_SWIPE_DISTANCE_Y = 200;
+    private static int MIN_SWIPE_DISTANCE_X = 200;
+    private static int MIN_SWIPE_DISTANCE_Y = 400;
 
     // Maximal x and y axis swipe distance.
-    private static int MAX_SWIPE_DISTANCE_X = 2000;
-    private static int MAX_SWIPE_DISTANCE_Y = 1000;
+    private static int MAX_SWIPE_DISTANCE_X = 1000;
+    private static int MAX_SWIPE_DISTANCE_Y = 1500;
 
     // Source activity that display message in text view.
-    private MainActivity activity = null;
+    private SecondActivity activity = null;
 
-    public MainActivity getActivity() {
+    public SecondActivity getActivity() {
         return activity;
     }
 
-    public void setActivity(MainActivity activity) {
+    public void setActivity(SecondActivity activity) {
         this.activity = activity;
     }
 
