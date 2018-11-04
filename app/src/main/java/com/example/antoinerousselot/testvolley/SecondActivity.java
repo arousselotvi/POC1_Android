@@ -1,22 +1,58 @@
 package com.example.antoinerousselot.testvolley;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.antoinerousselot.gesture.DetectSwipeGestureListener;
 
-public class SecondActivity extends AppCompatActivity implements GestureDetector.OnDoubleTapListener, SensorEventListener {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+
+import static com.example.antoinerousselot.network.UrlConstants.POST_URL;
+
+public class SecondActivity extends AppCompatActivity implements GestureDetector.OnDoubleTapListener, SensorEventListener, View.OnClickListener {
 
     private static final String DEBUG_TAG = "Gestures";
+
+    //These are the components used for the image upload
+    private int REQ_CODE=100;
+    private String image="image";
+    private String imageName="name";
+    private TextView messageText;
+    private Button uploadButton, btnselectpic;
+    private EditText etxtUpload;
+    private ImageView imageview;
+    private ProgressDialog dialog = null;
+    private JSONObject jsonObject;
 
     // This is the gesture detector compat instance.
     private GestureDetectorCompat gestureDetectorCompat = null;
@@ -30,6 +66,22 @@ public class SecondActivity extends AppCompatActivity implements GestureDetector
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
+
+        // Create the buttons and other components for the upload by click
+        uploadButton = (Button)findViewById(R.id.button_upload);
+        btnselectpic = (Button)findViewById(R.id.button_choose);
+        messageText  = (TextView)findViewById(R.id.textView);
+        imageview = (ImageView)findViewById(R.id.imageView);
+        etxtUpload = (EditText)findViewById(R.id.etxtUpload);
+
+        btnselectpic.setOnClickListener(this);
+        uploadButton.setOnClickListener(this);
+
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Uploading Image...");
+        dialog.setCancelable(false);
+
+        jsonObject = new JSONObject();
 
         // Create a common gesture listener object.
         DetectSwipeGestureListener gestureListener = new DetectSwipeGestureListener();
@@ -118,5 +170,57 @@ public class SecondActivity extends AppCompatActivity implements GestureDetector
         // unregister listener
         super.onPause();
         sensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.button_choose:
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, REQ_CODE);
+                break;
+            case R.id.button_upload:
+                Bitmap imageBit = ((BitmapDrawable) imageview.getDrawable()).getBitmap();
+                dialog.show();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                imageBit.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                try {
+                    jsonObject.put(imageName, etxtUpload.getText().toString().trim());
+                    Log.e("Image name", etxtUpload.getText().toString().trim());
+                    jsonObject.put(image, encodedImage);
+                } catch (JSONException e) {
+                    Log.e("JSONObject Here", e.toString());
+                }
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, POST_URL, jsonObject,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject jsonObject) {
+                                Log.e("Message from server", jsonObject.toString());
+                                dialog.dismiss();
+                                messageText.setText("Image Uploaded Successfully");
+                                Toast.makeText(getApplication(), "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Log.e("Message from server", volleyError.toString());
+                        dialog.dismiss();
+                    }
+                });
+                jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                Volley.newRequestQueue(this).add(jsonObjectRequest);
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQ_CODE && resultCode == RESULT_OK && data != null) {
+            Uri selectedImageUri = data.getData();
+            imageview.setImageURI(selectedImageUri);
+        }
     }
 }
