@@ -46,7 +46,7 @@ public class SecondActivity extends AppCompatActivity implements GestureDetector
     //These are the components used for the image upload
     private int REQ_CODE=100;
     private String image="image";
-    private String imageName="name";
+    private String imageName="Image";
     private TextView messageText;
     private Button uploadButton, btnselectpic;
     private EditText etxtUpload;
@@ -204,7 +204,7 @@ public class SecondActivity extends AppCompatActivity implements GestureDetector
                         }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        Log.e("Message from server", volleyError.toString());
+                        Log.e("Message from server V", volleyError.toString());
                         dialog.dismiss();
                     }
                 });
