@@ -36,6 +36,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import static com.example.antoinerousselot.network.UrlConstants.POST_URL;
 
@@ -45,8 +47,8 @@ public class SecondActivity extends AppCompatActivity implements GestureDetector
 
     //These are the components used for the image upload
     private int REQ_CODE=100;
-    private String image="image";
-    private String imageName="Image";
+    private String image="data";
+    private String imageName="Image.jpg";
     private TextView messageText;
     private Button uploadButton, btnselectpic;
     private EditText etxtUpload;
@@ -185,14 +187,18 @@ public class SecondActivity extends AppCompatActivity implements GestureDetector
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 imageBit.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
                 String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                HashMap<String, JSONObject> params = new HashMap<>();
+                JSONObject file=new JSONObject();
                 try {
-                    jsonObject.put(imageName, etxtUpload.getText().toString().trim());
-                    Log.e("Image name", etxtUpload.getText().toString().trim());
-                    jsonObject.put(image, encodedImage);
+                    file.put("originalname",imageName);
+                    file.put("filename",encodedImage);
+                    file.put("path","uploads/"+encodedImage);
                 } catch (JSONException e) {
-                    Log.e("JSONObject Here", e.toString());
+                    e.printStackTrace();
                 }
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, POST_URL, jsonObject,
+
+                params.put("file", file); // the entered data as the JSON body.
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, POST_URL, new JSONObject(params),
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject jsonObject) {
@@ -208,6 +214,30 @@ public class SecondActivity extends AppCompatActivity implements GestureDetector
                         dialog.dismiss();
                     }
                 });
+                Log.i("jsonObject",jsonObjectRequest.toString());
+                try {
+                    JSONObject jsonObject1 = jsonObject.getJSONObject("file");
+                    Iterator<String> iterator = jsonObject1.keys();
+                    while (iterator.hasNext()){
+                        String key = iterator.next();
+                        try {
+                            Log.i("jsonObject",key);
+                        }catch (Exception e){
+
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Iterator<String> iter = jsonObject.keys();
+                while (iter.hasNext()){
+                    String key = iter.next();
+                    try {
+                        Log.i("jsonObject",key);
+                    }catch (Exception e){
+
+                    }
+                }
                 jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
                         DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                         DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
