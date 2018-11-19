@@ -5,6 +5,7 @@ import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.example.antoinerousselot.testvolley.MainActivity;
+import com.example.antoinerousselot.testvolley.RetrofitUploadActivity;
 import com.example.antoinerousselot.testvolley.SecondActivity;
 
 /**
@@ -67,5 +68,7 @@ public class DetectSwipeGestureListener extends GestureDetector.SimpleOnGestureL
         return true;
     }
 
+    public void setActivity(RetrofitUploadActivity retrofitUploadActivity) {
+    }
 }
 

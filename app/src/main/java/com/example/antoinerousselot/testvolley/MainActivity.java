@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 else {
                     Toast.makeText(this, "Welcome to paradise TOTEM", Toast.LENGTH_SHORT).show();
-                    Intent openSecondAct = new Intent(this,SecondActivity.class);
+                    Intent openSecondAct = new Intent(this,RetrofitUploadActivity.class);
                     startActivity(openSecondAct);
                 }
             }
