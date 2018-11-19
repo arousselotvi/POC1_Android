@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -38,6 +39,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import static com.example.antoinerousselot.network.UrlConstants.POST_URL;
 
@@ -213,9 +215,20 @@ public class SecondActivity extends AppCompatActivity implements GestureDetector
                         Log.e("Message from server V", volleyError.toString());
                         dialog.dismiss();
                     }
-                });
+                }){
+
+                    /**
+                     * Passing some request headers
+                     */
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        HashMap<String, String> headers = new HashMap<String, String>();
+                        headers.put("content-type", "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW");
+                        return headers;
+                    }
+                };
                 Log.i("jsonObject",jsonObjectRequest.toString());
-                try {
+                /*try {
                     JSONObject jsonObject1 = jsonObject.getJSONObject("file");
                     Iterator<String> iterator = jsonObject1.keys();
                     while (iterator.hasNext()){
@@ -228,7 +241,7 @@ public class SecondActivity extends AppCompatActivity implements GestureDetector
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
+                }*/
                 Iterator<String> iter = jsonObject.keys();
                 while (iter.hasNext()){
                     String key = iter.next();
