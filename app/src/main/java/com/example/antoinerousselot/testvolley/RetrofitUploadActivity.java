@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -44,6 +45,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -54,6 +56,8 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.example.antoinerousselot.network.UrlConstants.POST_URL;
 
@@ -66,12 +70,14 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
     private String image="data";
     private String imageName="Image.jpg";
     private TextView messageText;
-    private Button uploadButton, btnselectpic;
+    private Button uploadButton, btnselectpic, downloadButton, selectGetButton;
     private EditText etxtUpload;
     private ImageView imageview;
     private ProgressDialog dialog = null;
     private JSONObject jsonObject;
     private Uri selectedImageUri;
+    private String urlGetImage;
+    private String TAGDL = "DownloadImage";
 
     // This is the gesture detector compat instance.
     private GestureDetectorCompat gestureDetectorCompat = null;
@@ -89,12 +95,16 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
         // Create the buttons and other components for the upload by click
         uploadButton = (Button)findViewById(R.id.button_upload);
         btnselectpic = (Button)findViewById(R.id.button_choose);
+        downloadButton = (Button)findViewById(R.id.button_download);
+        selectGetButton = (Button)findViewById(R.id.button_select_get);
         messageText  = (TextView)findViewById(R.id.textView);
         imageview = (ImageView)findViewById(R.id.imageView);
         etxtUpload = (EditText)findViewById(R.id.etxtUpload);
 
         btnselectpic.setOnClickListener(this);
         uploadButton.setOnClickListener(this);
+        downloadButton.setOnClickListener(this);
+        selectGetButton.setOnClickListener(this);
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Uploading Image...");
@@ -203,6 +213,11 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
                 //dialog.show();
                 uploadFile(selectedImageUri);
                 break;
+            case R.id.button_download:
+                Log.v(TAGDL,"DL button pressed");
+                urlGetImage = "http://node.oignon.ovh1.ec-m.fr/uploads/image.jpg";
+                getRetrofitImage(urlGetImage);
+                break;
         }
     }
 
@@ -252,6 +267,91 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
         if (requestCode == REQ_CODE && resultCode == RESULT_OK && data != null) {
             selectedImageUri = data.getData();
             imageview.setImageURI(selectedImageUri);
+        }
+    }
+
+    void getRetrofitImage(String urlGetImage) {
+
+        Log.v(TAGDL,"getRetrofitImage accessed");
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(urlGetImage)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        FileGetService service = retrofit.create(FileGetService.class);
+
+        Log.v(TAGDL,"FileGetService créé");
+
+        Call<ResponseBody> call = service.getImageDetails();
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+                Log.v(TAGDL,"onResponse accessed");
+                try {
+
+                    Log.d("onResponse", "Response came from server");
+
+                    boolean FileDownloaded = DownloadImage(response.body());
+
+                    Log.d("onResponse", "Image is downloaded and saved : " + FileDownloaded);
+
+                } catch (Exception e) {
+                    Log.d("onResponse", "There is an error");
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d("onFailure", t.toString());
+            }
+        });
+    }
+
+
+    private boolean DownloadImage(ResponseBody body) {
+        try {
+            Log.d("DownloadImage", "Reading and writing file");
+            InputStream in = null;
+            FileOutputStream out = null;
+
+            try {
+                in = body.byteStream();
+                out = new FileOutputStream(getExternalFilesDir(null) + File.separator + "AndroidTutorialPoint.jpg");
+                int c;
+
+                while ((c = in.read()) != -1) {
+                    out.write(c);
+                }
+            }
+            catch (IOException e) {
+                Log.d("DownloadImage",e.toString());
+                return false;
+            }
+            finally {
+                if (in != null) {
+                    in.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
+            }
+
+            int width, height;
+            ImageView image = (ImageView) findViewById(R.id.imageView);
+            Bitmap bMap = BitmapFactory.decodeFile(getExternalFilesDir(null) + File.separator + "AndroidTutorialPoint.jpg");
+            width = 2*bMap.getWidth();
+            height = 6*bMap.getHeight();
+            Bitmap bMap2 = Bitmap.createScaledBitmap(bMap, width, height, false);
+            image.setImageBitmap(bMap2);
+
+            return true;
+
+        } catch (IOException e) {
+            Log.d("DownloadImage",e.toString());
+            return false;
         }
     }
 }
