@@ -215,7 +215,7 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
                 break;
             case R.id.button_download:
                 Log.v(TAGDL,"DL button pressed");
-                urlGetImage = "http://node.oignon.ovh1.ec-m.fr/uploads/image.jpg";
+                urlGetImage = "http://node.melisse.ovh1.ec-m.fr/uploads/image.jpg";
                 getRetrofitImage(urlGetImage);
                 break;
         }
@@ -274,12 +274,9 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
 
         Log.v(TAGDL,"getRetrofitImage accessed");
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(urlGetImage)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        FileGetService service = retrofit.create(FileGetService.class);
+        // create upload service client
+        FileGetService service =
+                ServiceGenerator.createService(FileGetService.class);
 
         Log.v(TAGDL,"FileGetService créé");
 
@@ -291,21 +288,21 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
                 Log.v(TAGDL,"onResponse accessed");
                 try {
 
-                    Log.d("onResponse", "Response came from server");
+                    Log.d(TAGDL, "Response came from server");
 
                     boolean FileDownloaded = DownloadImage(response.body());
 
-                    Log.d("onResponse", "Image is downloaded and saved : " + FileDownloaded);
+                    Log.d(TAGDL, "Image is downloaded and saved : " + FileDownloaded);
 
                 } catch (Exception e) {
-                    Log.d("onResponse", "There is an error");
+                    Log.d(TAGDL, "There is an error");
                     e.printStackTrace();
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.d("onFailure", t.toString());
+                Log.d(TAGDL, t.toString());
             }
         });
     }
@@ -342,8 +339,8 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
             int width, height;
             ImageView image = (ImageView) findViewById(R.id.imageView);
             Bitmap bMap = BitmapFactory.decodeFile(getExternalFilesDir(null) + File.separator + "AndroidTutorialPoint.jpg");
-            width = 2*bMap.getWidth();
-            height = 6*bMap.getHeight();
+            width = bMap.getWidth();
+            height = bMap.getHeight();
             Bitmap bMap2 = Bitmap.createScaledBitmap(bMap, width, height, false);
             image.setImageBitmap(bMap2);
 

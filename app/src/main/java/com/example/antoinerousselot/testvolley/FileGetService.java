@@ -5,6 +5,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface FileGetService {
-    @GET("infosImage")
+    @GET("uploads/image.jpg")
     Call<ResponseBody> getImageDetails();
 }
