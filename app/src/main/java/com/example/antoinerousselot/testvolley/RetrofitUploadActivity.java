@@ -13,6 +13,7 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.v4.view.GestureDetectorCompat;
@@ -46,6 +47,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -215,8 +217,7 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
                 break;
             case R.id.button_download:
                 Log.v(TAGDL,"DL button pressed");
-                urlGetImage = "http://node.melisse.ovh1.ec-m.fr/uploads/image.jpg";
-                getRetrofitImage(urlGetImage);
+                getRetrofitImage();
                 break;
         }
     }
@@ -270,7 +271,7 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
         }
     }
 
-    void getRetrofitImage(String urlGetImage) {
+    void getRetrofitImage() {
 
         Log.v(TAGDL,"getRetrofitImage accessed");
 
@@ -309,46 +310,64 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
 
 
     private boolean DownloadImage(ResponseBody body) {
+        Bitmap bMap = BitmapFactory.decodeFile(getExternalFilesDir(null) + File.separator + "AndroidTutorialPoint.jpg");
+
         try {
-            Log.d("DownloadImage", "Reading and writing file");
-            InputStream in = null;
-            FileOutputStream out = null;
+            File file = new File(getExternalFilesDir(null) + File.separator + "TotemImage.png");
+
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
 
             try {
-                in = body.byteStream();
-                out = new FileOutputStream(getExternalFilesDir(null) + File.separator + "AndroidTutorialPoint.jpg");
-                int c;
+                byte[] fileReader = new byte[4096];
 
-                while ((c = in.read()) != -1) {
-                    out.write(c);
+                long fileSize = body.contentLength();
+                long fileSizeDownloaded = 0;
+
+                inputStream = body.byteStream();
+                outputStream = new FileOutputStream(file);
+
+                while (true) {
+                    int read = inputStream.read(fileReader);
+
+                    if (read == -1) {
+                        break;
+                    }
+
+                    outputStream.write(fileReader, 0, read);
+
+                    fileSizeDownloaded += read;
+
+                    Log.d(TAGDL, "file download: " + fileSizeDownloaded + " of " + fileSize);
                 }
-            }
-            catch (IOException e) {
-                Log.d("DownloadImage",e.toString());
+
+                bMap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream);
+                outputStream.flush();
+
+            } catch (IOException e) {
                 return false;
-            }
-            finally {
-                if (in != null) {
-                    in.close();
+            } finally {
+                if (inputStream != null) {
+                    inputStream.close();
                 }
-                if (out != null) {
-                    out.close();
+
+                if (outputStream != null) {
+                    outputStream.close();
                 }
             }
-
-            int width, height;
-            ImageView image = (ImageView) findViewById(R.id.imageView);
-            Bitmap bMap = BitmapFactory.decodeFile(getExternalFilesDir(null) + File.separator + "AndroidTutorialPoint.jpg");
-            width = bMap.getWidth();
-            height = bMap.getHeight();
-            Bitmap bMap2 = Bitmap.createScaledBitmap(bMap, width, height, false);
-            image.setImageBitmap(bMap2);
-
-            return true;
-
         } catch (IOException e) {
-            Log.d("DownloadImage",e.toString());
             return false;
         }
+
+        int width, height;
+        ImageView image = (ImageView) findViewById(R.id.imageView);
+        width = bMap.getWidth();
+        height = bMap.getHeight();
+        Bitmap bMap2 = Bitmap.createScaledBitmap(bMap, width, height, false);
+        image.setImageBitmap(bMap2);
+
+        MediaStore.Images.Media.insertImage(getContentResolver(), bMap, "downloadedImage" , "Totem");
+        Toast.makeText(this, "Image enregistrée", Toast.LENGTH_SHORT).show();
+        return true;
     }
 }

@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == CommonStatusCodes.SUCCESS && requestCode == REQUEST_CODE){
             if (data != null && data.hasExtra("barcode")){
-                Toast.makeText(this,data.getStringExtra("barcode"),Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this,data.getStringExtra("barcode"),Toast.LENGTH_SHORT).show();
                 HashMap<String, String> stringParamsAuth = new HashMap<>();
                 stringParamsAuth.put("barcodeSent", data.getStringExtra("barcode"));
                 NetworkController.getInstance().connect(this, POST_URL_AUTHPLAYER1_REQUEST_CODE, Request.Method.POST, stringParamsAuth, this);

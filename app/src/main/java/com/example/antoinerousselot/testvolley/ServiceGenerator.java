@@ -8,7 +8,7 @@ import static com.example.antoinerousselot.network.UrlConstants.POST_URL;
 
 public class ServiceGenerator {
 
-    private static final String BASE_URL = "http://node.melisse.ovh1.ec-m.fr/";
+    private static final String BASE_URL = "http://node.oignon.ovh1.ec-m.fr/";
 
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
