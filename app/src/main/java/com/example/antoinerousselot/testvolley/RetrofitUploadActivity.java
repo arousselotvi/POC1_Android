@@ -310,10 +310,9 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
 
 
     private boolean DownloadImage(ResponseBody body) {
-        Bitmap bMap = BitmapFactory.decodeFile(getExternalFilesDir(null) + File.separator + "AndroidTutorialPoint.jpg");
 
         try {
-            File file = new File(getExternalFilesDir(null) + File.separator + "TotemImage.png");
+            File file = new File(getExternalFilesDir(null) + File.separator + "TotemImage.jpg");
 
             InputStream inputStream = null;
             OutputStream outputStream = null;
@@ -341,7 +340,20 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
                     Log.d(TAGDL, "file download: " + fileSizeDownloaded + " of " + fileSize);
                 }
 
+                //creation of bitmap and put it into preview
+                Bitmap bMap = BitmapFactory.decodeFile(getExternalFilesDir(null) + File.separator + "TotemImage.jpg");
                 bMap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream);
+                int width, height;
+                ImageView image = (ImageView) findViewById(R.id.imageView);
+                width = bMap.getWidth();
+                height = bMap.getHeight();
+                Bitmap bMap2 = Bitmap.createScaledBitmap(bMap, width, height, false);
+                image.setImageBitmap(bMap2);
+
+                //store as image, get it accessible from gallery
+                MediaStore.Images.Media.insertImage(getContentResolver(), bMap, "TotemImage" , "Totem");
+                Toast.makeText(this, "Image enregistrée", Toast.LENGTH_SHORT).show();
+
                 outputStream.flush();
 
             } catch (IOException e) {
@@ -358,16 +370,6 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
         } catch (IOException e) {
             return false;
         }
-
-        int width, height;
-        ImageView image = (ImageView) findViewById(R.id.imageView);
-        width = bMap.getWidth();
-        height = bMap.getHeight();
-        Bitmap bMap2 = Bitmap.createScaledBitmap(bMap, width, height, false);
-        image.setImageBitmap(bMap2);
-
-        MediaStore.Images.Media.insertImage(getContentResolver(), bMap, "downloadedImage" , "Totem");
-        Toast.makeText(this, "Image enregistrée", Toast.LENGTH_SHORT).show();
         return true;
     }
 }
