@@ -37,6 +37,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.antoinerousselot.gesture.DetectSwipeGestureListener;
+import com.example.antoinerousselot.network.NetworkController;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -62,8 +63,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.example.antoinerousselot.network.UrlConstants.POST_URL;
+import static com.example.antoinerousselot.network.UrlConstants.POST_URL_REQUEST_CODE;
+import static com.example.antoinerousselot.network.UrlConstants.POST_URL_TEXT_REQUEST_CODE;
 
-public class RetrofitUploadActivity extends AppCompatActivity implements GestureDetector.OnDoubleTapListener, SensorEventListener, View.OnClickListener {
+public class RetrofitUploadActivity extends AppCompatActivity implements GestureDetector.OnDoubleTapListener, SensorEventListener, View.OnClickListener, NetworkController.ResultListener {
 
     private static final String DEBUG_TAG = "Gestures";
 
@@ -71,15 +74,15 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
     private int REQ_CODE=100;
     private String image="data";
     private String imageName="Image.jpg";
-    private TextView messageText;
-    private Button uploadButton, btnselectpic, downloadButton, selectGetButton;
-    private EditText etxtUpload;
+    private Button uploadButton, btnselectpic, downloadButton, selectGetButton, uploadTextButton;
+    private EditText txtUpload;
     private ImageView imageview;
     private ProgressDialog dialog = null;
     private JSONObject jsonObject;
     private Uri selectedImageUri;
     private String urlGetImage;
     private String TAGDL = "DownloadImage";
+    private String TAGUPDTXT = "UploadText";
 
     // This is the gesture detector compat instance.
     private GestureDetectorCompat gestureDetectorCompat = null;
@@ -99,14 +102,15 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
         btnselectpic = (Button)findViewById(R.id.button_choose);
         downloadButton = (Button)findViewById(R.id.button_download);
         selectGetButton = (Button)findViewById(R.id.button_select_get);
-        messageText  = (TextView)findViewById(R.id.textView);
         imageview = (ImageView)findViewById(R.id.imageView);
-        etxtUpload = (EditText)findViewById(R.id.etxtUpload);
+        txtUpload = (EditText)findViewById(R.id.txtUpload);
+        uploadTextButton = (Button)findViewById(R.id.button_upload_text);
 
         btnselectpic.setOnClickListener(this);
         uploadButton.setOnClickListener(this);
         downloadButton.setOnClickListener(this);
         selectGetButton.setOnClickListener(this);
+        uploadTextButton.setOnClickListener(this);
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Uploading Image...");
@@ -218,6 +222,10 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
             case R.id.button_download:
                 Log.v(TAGDL,"DL button pressed");
                 getRetrofitImage();
+                break;
+            case R.id.button_upload_text:
+                uploadText();
+                Log.v(TAGUPDTXT, "UPDTXT button clicked");
                 break;
         }
     }
@@ -371,5 +379,36 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
             return false;
         }
         return true;
+    }
+
+    private void uploadText(){
+
+        String sentText = txtUpload.getText().toString();
+        Log.v(TAGUPDTXT, "text to send : " + sentText);
+
+        if (!sentText.equals("")){
+            Log.v(TAGUPDTXT, "entered in If");
+            HashMap<String, String> stringParams = new HashMap<>();
+            stringParams.put("sentText", sentText);
+            NetworkController.getInstance().connect(this, POST_URL_TEXT_REQUEST_CODE, Request.Method.POST, stringParams, this);
+        }
+    }
+
+    @Override
+    public void onResult(int requestCode, boolean isSuccess, JSONObject jsonObject, VolleyError volleyError, ProgressDialog progressDialog) throws JSONException {
+        if (requestCode == POST_URL_TEXT_REQUEST_CODE)
+        {
+            if (isSuccess)
+            {
+                Toast.makeText(this, "Texte envoyé", Toast.LENGTH_SHORT).show();
+                txtUpload.getText().clear();
+            }
+            else
+            {
+                Toast.makeText(this, "Erreur d'envoi du texte", Toast.LENGTH_SHORT).show();
+            }
+        }
+        if (progressDialog != null && progressDialog.isShowing())
+            progressDialog.dismiss();
     }
 }

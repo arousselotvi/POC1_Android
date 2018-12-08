@@ -121,6 +121,9 @@ public class NetworkController {
             case UrlConstants.POST_URL_AUTHPLAYER1_REQUEST_CODE:
                 url = UrlConstants.POST_URL_AUTH_PLAYER1;
                 break;
+            case UrlConstants.POST_URL_TEXT_REQUEST_CODE:
+                url = UrlConstants.POST_URL_TEXT;
+                break;
         }
         return url;
     }
