@@ -123,8 +123,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     startActivityForResult(intentBarcodeRetry,REQUEST_CODE);
                 }
                 else {
-                    Log.d("else ok",TAGPLAYER);
-                    Log.d(jsonObject.getString("Player"),TAGPLAYER);
                     Player = jsonObject.getString("Player");
                     Log.d(Player,TAGPLAYER);
                     Toast.makeText(this, "Welcome to paradise TOTEM", Toast.LENGTH_SHORT).show();
