@@ -3,13 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    tools:context=".RetrofitUploadActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@drawable/GreenGradient"
+
+    tools:context="com.example.antoinerousselot.withDesign.ConnectedActivity">
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/textViewPlayer"
         android:layout_gravity="center_horizontal"
@@ -25,25 +26,25 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal">
 
-    <Button
-        android:id="@+id/button_choose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/colorAccent"
-        android:text="Browse Image"
-        android:textColor="#fff"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginRight="5dp"/>
+        <Button
+            android:id="@+id/button_choose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:text="Browse Image"
+            android:textColor="#fff"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginRight="5dp"/>
 
-    <Button
-        android:id="@+id/button_select_get"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/colorAccent"
-        android:text="Select DL target"
-        android:textColor="#fff"
-        android:layout_marginLeft="5dp"
-        />
+        <Button
+            android:id="@+id/button_select_get"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:text="Select DL target"
+            android:textColor="#fff"
+            android:layout_marginLeft="5dp"
+            />
     </LinearLayout>
 
     <ImageView
@@ -60,24 +61,24 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal">
 
-    <Button
-        android:id="@+id/button_upload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/colorAccent"
-        android:text="upload"
-        android:textColor="#fff"
-        android:layout_marginRight="10dp"/>
+        <Button
+            android:id="@+id/button_upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:text="upload"
+            android:textColor="#fff"
+            android:layout_marginRight="10dp"/>
 
 
-    <Button
-        android:id="@+id/button_download"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/colorAccent"
-        android:text="download"
-        android:textColor="#fff"
-        android:layout_marginLeft="10dp"/>
+        <Button
+            android:id="@+id/button_download"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:text="download"
+            android:textColor="#fff"
+            android:layout_marginLeft="10dp"/>
 
     </LinearLayout>
 
