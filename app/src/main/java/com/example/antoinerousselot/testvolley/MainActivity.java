@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button barcodeButton;
     TextView responseTv;
 
+    String Player;
+    private String TAGPLAYER="TAGPLAYER";
+
     //For Gesture detection
     private static final String DEBUG_TAG = "Gestures";
 
@@ -120,8 +123,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     startActivityForResult(intentBarcodeRetry,REQUEST_CODE);
                 }
                 else {
+                    Log.d("else ok",TAGPLAYER);
+                    Log.d(jsonObject.getString("Player"),TAGPLAYER);
+                    Player = jsonObject.getString("Player");
+                    Log.d(Player,TAGPLAYER);
                     Toast.makeText(this, "Welcome to paradise TOTEM", Toast.LENGTH_SHORT).show();
                     Intent openSecondAct = new Intent(this,RetrofitUploadActivity.class);
+                    openSecondAct.putExtra("player", Player);
                     startActivity(openSecondAct);
                 }
             }

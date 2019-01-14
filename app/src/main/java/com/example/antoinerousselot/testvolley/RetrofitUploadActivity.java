@@ -68,8 +68,6 @@ import static com.example.antoinerousselot.network.UrlConstants.POST_URL_TEXT_RE
 
 public class RetrofitUploadActivity extends AppCompatActivity implements GestureDetector.OnDoubleTapListener, SensorEventListener, View.OnClickListener, NetworkController.ResultListener {
 
-    private static final String DEBUG_TAG = "Gestures";
-
     //These are the components used for the image upload
     private int REQ_CODE=100;
     private String image="data";
@@ -81,8 +79,15 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
     private JSONObject jsonObject;
     private Uri selectedImageUri;
     private String urlGetImage;
+
+    // tags
     private String TAGDL = "DownloadImage";
     private String TAGUPDTXT = "UploadText";
+    private static final String DEBUG_TAG = "Gestures";
+
+
+    //To display player information
+    private TextView textViewPlayer;
 
     // This is the gesture detector compat instance.
     private GestureDetectorCompat gestureDetectorCompat = null;
@@ -96,6 +101,12 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_retrofit_upload);
+
+        //Retrieve information on the player
+        String Player;
+        Player = this.getIntent().getStringExtra("player");
+        textViewPlayer = (TextView)findViewById(R.id.textViewPlayer);
+        textViewPlayer.setText(Player);
 
         // Create the buttons and other components for the upload by click
         uploadButton = (Button)findViewById(R.id.button_upload);
