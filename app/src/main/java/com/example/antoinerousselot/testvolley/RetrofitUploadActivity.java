@@ -26,6 +26,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,6 +65,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.example.antoinerousselot.network.UrlConstants.POST_URL;
+import static com.example.antoinerousselot.network.UrlConstants.POST_URL_LOGOUT_CODE;
 import static com.example.antoinerousselot.network.UrlConstants.POST_URL_REQUEST_CODE;
 import static com.example.antoinerousselot.network.UrlConstants.POST_URL_TEXT_REQUEST_CODE;
 
@@ -74,6 +76,7 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
     private String image="data";
     private String imageName="Image.jpg";
     private Button uploadButton, btnselectpic, downloadButton, selectGetButton, uploadTextButton;
+    private ImageButton logoutButton;
     private EditText txtUpload;
     private ImageView imageview;
     private ProgressDialog dialog = null;
@@ -89,6 +92,7 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
 
     //To display player information
     private TextView textViewPlayer;
+    private String Player;
 
     // This is the gesture detector compat instance.
     private GestureDetectorCompat gestureDetectorCompat = null;
@@ -104,7 +108,6 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
         setContentView(R.layout.activity_retrofit_upload);
 
         //Retrieve information on the player
-        String Player;
         Player = this.getIntent().getStringExtra("player");
         textViewPlayer = (TextView)findViewById(R.id.textViewPlayer);
         textViewPlayer.setText(Player);
@@ -117,12 +120,14 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
         imageview = (ImageView)findViewById(R.id.imageView);
         txtUpload = (EditText)findViewById(R.id.txtUpload);
         uploadTextButton = (Button)findViewById(R.id.button_upload_text);
+        logoutButton = (ImageButton) findViewById(R.id.button_logout);
 
         btnselectpic.setOnClickListener(this);
         uploadButton.setOnClickListener(this);
         downloadButton.setOnClickListener(this);
         selectGetButton.setOnClickListener(this);
         uploadTextButton.setOnClickListener(this);
+        logoutButton.setOnClickListener(this);
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Uploading Image...");
@@ -239,6 +244,8 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
                 uploadText();
                 Log.v(TAGUPDTXT, "UPDTXT button clicked");
                 break;
+            case R.id.button_logout:
+                logout();
         }
     }
 
@@ -404,6 +411,13 @@ public class RetrofitUploadActivity extends AppCompatActivity implements Gesture
             stringParams.put("sentText", sentText);
             NetworkController.getInstance().connect(this, POST_URL_TEXT_REQUEST_CODE, Request.Method.POST, stringParams, this);
         }
+    }
+
+    private void logout(){
+        HashMap<String, String> stringParamsLogout = new HashMap<>();
+        stringParamsLogout.put("player", Player);
+        NetworkController.getInstance().connect(this, POST_URL_LOGOUT_CODE, Request.Method.POST, stringParamsLogout, this);
+        finish();
     }
 
     @Override
